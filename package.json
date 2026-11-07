@@ -1,0 +1,15 @@
+{
+  "name": "yad2-private-filter",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Chrome extension: hide dealer ads on yad2 vehicle listings.",
+  "scripts": {
+    "test": "node --test tests/",
+    "build": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1",
+    "icons": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/make-icons.ps1"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.3"
+  }
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<!--
+  Toolbar popup: opens when the extension icon is clicked.
+  Logic is in popup.js (Chrome doesn't allow inline scripts in extensions).
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Private Sellers Filter for Yad2</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="header">
+      <img class="logo" src="icons/icon48.png" alt="" width="32" height="32" />
+      <div>
+        <h1 class="title">מוכרים פרטיים בלבד</h1>
+        <p class="subtitle">הסתרת מודעות סוחרים ביד2</p>
+      </div>
+    </header>
+
+    <label class="row">
+      <span class="row-label">הסתר מודעות סוחרים</span>
+      <input type="checkbox" id="toggle" class="toggle-input" />
+      <span class="switch" aria-hidden="true"></span>
+    </label>
+
+    <!-- Filled in by popup.js; one of these is shown. -->
+    <p class="status" id="status" hidden></p>
+    <div class="not-yad2" id="not-yad2" hidden>
+      <p>התוסף פועל בעמודי הרכב של יד2.</p>
+      <button type="button" class="link-button" id="open-yad2">פתח את יד2 רכב</button>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

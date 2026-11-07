@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Private Sellers Filter for Yad2",
+  "version": "1.0.0",
+  "description": "Adds a toggle to yad2 vehicle listings that hides ads from car dealers/agencies, leaving only private sellers.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Private Sellers Filter for Yad2",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.yad2.co.il/vehicles/*",
+        "https://yad2.co.il/vehicles/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_start"
+    }
+  ]
+}
