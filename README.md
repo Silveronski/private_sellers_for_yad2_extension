@@ -106,7 +106,7 @@ Replace `icon-original.png` with a square image (1024×1024 or larger) and run `
 | `storage` | Remembers whether the filter is on |
 | Content script on `yad2.co.il/vehicles/*` | Reads and hides listing cards. The extension runs nowhere else |
 
-The extension collects no data, makes no network requests and loads no remote code. The only things it stores are the on/off setting (`chrome.storage.local`) and, per tab, the IDs of dealer ads already counted (`sessionStorage`).
+The extension collects no data, makes no network requests and loads no remote code. See the full [privacy policy](PRIVACY.md). The only things it stores are the on/off setting (`chrome.storage.local`) and, per tab, the IDs of dealer ads already counted (`sessionStorage`).
 
 ## Limitations
 
