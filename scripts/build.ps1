@@ -149,7 +149,7 @@ if ($SkipTests) {
     Problem "node_modules is missing; run 'npm install' first (or use -SkipTests)."
     Stop-IfProblems
   }
-  $testOutput = & node --test tests/ 2>&1
+  $testOutput = & node --test --test-reporter=tap "tests/*.test.js" 2>&1
   if ($LASTEXITCODE -ne 0) {
     $testOutput | ForEach-Object { Write-Host "  $_" }
     Problem "tests failed (output above)."

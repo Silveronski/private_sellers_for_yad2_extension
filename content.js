@@ -35,8 +35,12 @@
 
   // Ad links. yad2 uses relative hrefs ("item/abc123?..."), so the selector is
   // loose; getAdToken() reads the browser-resolved path to be exact.
-  const AD_LINK_SELECTOR = 'a[href*="item/"]';
+  // Some cards link off yad2 instead (e.g. receiver auctions, "מכירה פומבית",
+  // → konesy2.co.il/live/4638). Those carry data-listing-type and are always
+  // treated as dealers.
+  const AD_LINK_SELECTOR = 'a[href*="item/"], a[data-listing-type]';
   const AD_TOKEN_PATTERN = /\/item\/([A-Za-z0-9_-]+)/;
+  const YAD2_HOST_PATTERN = /(^|\.)yad2\.co\.il$/i;
 
   // Once an element is this tall, assume it's the whole card (see findCard).
   const CARD_MIN_HEIGHT_PX = 120;
@@ -48,8 +52,14 @@
     '[class*="commercial" i]',
     '[data-testid*="agency" i]',
     '[data-testid="trade-in-flag"]', // "גם בטרייד אין"
+    '[data-testid="kones-flag"]', //    "מכירה פומבית" (receiver auction)
   ].join(", ");
-  const DEALER_TEXT_MARKERS = ["התחייבויות", "טרייד אין", "טרייד-אין"];
+  const DEALER_TEXT_MARKERS = [
+    "התחייבויות",
+    "טרייד אין",
+    "טרייד-אין",
+    "מכירה פומבית",
+  ];
 
   // ─── State ────────────────────────────────────────────────────────────────
 
@@ -63,16 +73,33 @@
 
   // ─── Reading the page ─────────────────────────────────────────────────────
 
-  /** "…/item/abc123?x=1" → "abc123", or null for links that aren't ads. */
+  /** True for a listing card that links off yad2 (receiver auctions etc.). */
+  function isExternalAd(link) {
+    return (
+      link.hasAttribute("data-listing-type") &&
+      !!link.hostname &&
+      !YAD2_HOST_PATTERN.test(link.hostname)
+    );
+  }
+
+  /**
+   * The ad's ID from its link: "…/item/abc123?x=1" → "abc123". A card that
+   * links off yad2 uses its address instead ("konesy2.co.il/live/4638").
+   * null for links that aren't ads.
+   */
   function getAdToken(link) {
-    return AD_TOKEN_PATTERN.exec(link.pathname ?? "")?.[1] ?? null;
+    const itemToken = AD_TOKEN_PATTERN.exec(link.pathname ?? "")?.[1];
+    if (itemToken) return itemToken;
+    if (isExternalAd(link)) return `${link.hostname}${link.pathname}`;
+    return null;
   }
 
   /** True if every ad link inside `element` points to the same ad. */
   function holdsOnlyAd(element, token) {
-    return [...element.querySelectorAll(AD_LINK_SELECTOR)].every(
-      (link) => getAdToken(link) === token,
-    );
+    return [...element.querySelectorAll(AD_LINK_SELECTOR)].every((link) => {
+      const linkToken = getAdToken(link);
+      return linkToken === null || linkToken === token;
+    });
   }
 
   /**
@@ -105,8 +132,12 @@
     return DEALER_TEXT_MARKERS.some((phrase) => text.includes(phrase));
   }
 
-  /** "dealer" if the card shows a dealer marker, otherwise "private". */
-  function classifyCard(card) {
+  /**
+   * "dealer" if the card links off yad2 or shows a dealer marker, otherwise
+   * "private".
+   */
+  function classifyCard(card, link) {
+    if (isExternalAd(link)) return "dealer";
     return hasDealerMarker(card) ? "dealer" : "private";
   }
 
@@ -189,7 +220,7 @@
       if (handledCards.has(card)) continue;
       handledCards.add(card);
 
-      const kind = classifyCard(card);
+      const kind = classifyCard(card, link);
       // Only touch the DOM when the label changes, so we don't retrigger our
       // own MutationObserver for nothing.
       if (card.dataset.y2pf !== kind) card.dataset.y2pf = kind;
